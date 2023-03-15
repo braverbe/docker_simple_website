@@ -33,7 +33,9 @@ conn.commit()
 # Main page
 @app.route("/")
 def index():
-    return render_template("index.html")
+    cur.execute("SELECT * FROM users")
+    rows = cur.fetchall()
+    return str(rows)
 
 # Register page
 @app.route("/register", methods=["GET", "POST"])
