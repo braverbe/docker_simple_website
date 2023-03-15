@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request
 import psycopg2
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
 app.debug = True
 # connecting to db, i don't ave something important there :)
-db_host = "localhost"
+db_host = os.getenv("POSTGRES_HOST")
 db_port = "5432"
-db_name = "myappdb"
-db_user = "postgres"
-db_password = "pass"
+db_name = os.getenv("POSTGRES_DB")
+db_user = os.getenv("POSTGRES_USER")
+db_password = os.getenv("POSTGRES_PASSWORD")
 
 # connnecting to db
 conn = psycopg2.connect(
@@ -57,3 +59,6 @@ def register():
         return render_template("register_success.html")
     else:
         return render_template("register.html")
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
