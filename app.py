@@ -2,12 +2,16 @@ from flask import Flask, render_template, request
 import psycopg2
 import os
 from dotenv import load_dotenv
+import hashlib
+
+
 load_dotenv()
 app = Flask(__name__)
 app.debug = True
-# connecting to db, i don't ave something important there :)
+
+
 db_host = os.getenv("POSTGRES_HOST")
-db_port = "5432"
+db_port = os.getenv("POSTGRES_PORT")
 db_name = os.getenv("POSTGRES_DB")
 db_user = os.getenv("POSTGRES_USER")
 db_password = os.getenv("POSTGRES_PASSWORD")
@@ -47,12 +51,20 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
+        password_bytes = password.encode('utf-8')
+
+        # Hash the password bytes using the SHA-256 algorithm
+        hashed_bytes = hashlib.sha256(password_bytes)
+
+        # Convert the hashed bytes to a hexadecimal string
+        hashed_password = hashed_bytes.hexdigest()
+
         # input values to db
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO users (username, password)
             VALUES (%s, %s)
-        """, (username, password))
+        """, (username, hashed_password))
         conn.commit()
 
         # relocate to confirming registration page
